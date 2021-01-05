@@ -1,0 +1,6 @@
+Source/KSP_Data
+obj/
+*.dll
+*.xml
+*.zip
+*.gpg

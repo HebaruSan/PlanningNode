@@ -1,0 +1,7 @@
+LOADINGTOOLTIPSPLUS
+{
+	Overwrite = false
+	ToolTip  = PlanningNode_loadingTip1
+	ToolTip2 = PlanningNode_loadingTip2
+	ToolTip3 = PlanningNode_loadingTip3
+}

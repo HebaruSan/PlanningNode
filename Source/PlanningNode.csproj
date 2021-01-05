@@ -1,0 +1,95 @@
+﻿<Project>
+  <PropertyGroup>
+    <AssemblyName>PlanningNode</AssemblyName>
+    <GameDataPath>..\GameData\</GameDataPath>
+    <ChangelogFile>$(GameDataPath)$(AssemblyName)\$(AssemblyName)-Changelog.cfg</ChangelogFile>
+    <ZipFile>..\$(AssemblyName).zip</ZipFile>
+    <OutDir>$(GameDataPath)$(AssemblyName)\Plugins\</OutDir>
+    <BaseIntermediateOutputPath>..\obj\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>..\obj\</IntermediateOutputPath>
+    <Configuration>Release</Configuration>
+  </PropertyGroup>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+  <PropertyGroup>
+    <RootNamespace>PlanningNode</RootNamespace>
+    <ProjectGuid>{3F5F18BE-BDFD-445C-B108-9A69D830E553}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>7.3</LangVersion>
+    <TargetFramework>net47</TargetFramework>
+    <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <Optimize>true</Optimize>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>None</DebugType>
+    <DocumentationFile>$(OutDir)$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System.Data">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System.Xml">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="KSPAssets">
+      <HintPath>KSP_Data\Managed\KSPAssets.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>KSP_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>KSP_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>KSP_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>KSP_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>KSP_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>KSP_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>KSP_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+  <Target Name="MakeZip">
+    <PropertyGroup>
+      <Changelog>$([System.IO.File]::ReadAllText($(ChangelogFile)))</Changelog>
+    </PropertyGroup>
+    <WriteLinesToFile Condition="!$(Changelog.Contains('showChangelog = True'))"
+                      File="$(ChangelogFile)"
+                      Lines="$(Changelog.Replace('showChangelog = False', 'showChangelog = True'))"
+                      Overwrite="true" />
+    <ZipDirectory SourceDirectory="$(GameDataPath)"
+                  DestinationFile="$(ZipFile)"
+                  OverWrite="true" />
+  </Target>
+  <Target Name="CleanMore" AfterTargets="Clean">
+    <RemoveDir Directories="$(BaseIntermediateOutputPath)" />
+    <Delete Files="$(ZipFile)" />
+  </Target>
+</Project>

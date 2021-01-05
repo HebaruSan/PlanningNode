@@ -1,0 +1,16 @@
+{
+	"spec_version": 1,
+	"identifier":   "PlanningNode",
+	"name":         "Planning Node",
+	"abstract":     "Plan maneuver nodes from your parent body",
+	"description":  "Discoverable learn-by-doing method for finding transfers",
+	"$vref":        "#/ckan/ksp-avc",
+	"license":      "GPL-3.0",
+	"suggests": [
+		{ "name": "KerbalChangelog"     },
+		{ "name": "LoadingTipsPlus"     },
+		{ "name": "PreciseNode"         },
+		{ "name": "PreciseManeuver"     },
+		{ "name": "ManeuverNodeEvolved" }
+	]
+}

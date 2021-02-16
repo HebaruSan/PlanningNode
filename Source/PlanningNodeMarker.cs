@@ -17,9 +17,9 @@ namespace PlanningNode {
 
 		private void Start()
 		{
-			line1 = mkLine(gameObj1, labelStyle.normal.textColor);
-			line2 = mkLine(gameObj2, labelStyle.normal.textColor);
-			line3 = mkLine(gameObj3, labelStyle.normal.textColor);
+			line1 = mkLine(gameObj1);
+			line2 = mkLine(gameObj2);
+			line3 = mkLine(gameObj3);
 		}
 
 		private void OnDisable()
@@ -55,9 +55,13 @@ namespace PlanningNode {
 				where     = parent.position + atSOIlimit(parent, direction);
 				textWhere = where - ringScale * direction;
 
-				UpdateRing(line1, where - 2 * ringScale * direction, 3 * ringScale, direction);
-				UpdateRing(line2, where -     ringScale * direction, 2 * ringScale, direction);
-				UpdateRing(line3, where,                                 ringScale, direction);
+				float camDist   = cameraDist(where);
+				// Thin lines at a distance, slightly thicker up close
+				float thickness = 0.05f * (float)Math.Sqrt(2 * camDist);
+
+				UpdateRing(line1, where - 2 * ringScale * direction, 3 * ringScale, direction, camDist, thickness, myNode.color);
+				UpdateRing(line2, where -     ringScale * direction, 2 * ringScale, direction, camDist, thickness, myNode.color);
+				UpdateRing(line3, where,                                 ringScale, direction, camDist, thickness, myNode.color);
 			}
 		}
 
@@ -74,6 +78,7 @@ namespace PlanningNode {
 					if (0 < camDist && camDist < ringScale) {
 						var offset = 0.6f * ringScale / camDist + 10;
 
+						labelStyle.normal.textColor = myNode.color;
 						if (GUI.Button(
 							new Rect(screenWhere.x - 50, Screen.height - screenWhere.y + offset, 100, 30),
 							myNode.GetCaption(vessel),
@@ -86,20 +91,20 @@ namespace PlanningNode {
 			}
 		}
 
-		private LineRenderer mkLine(GameObject gameObj, Color color)
+		private LineRenderer mkLine(GameObject gameObj)
 		{
 			// Trying to learn from TWP
 			gameObj.layer = 9;
 			var line = gameObj.AddComponent<LineRenderer>();
 			line.transform.parent = null;
 			line.useWorldSpace = true;
+			line.loop = true;
 			if (markerMaterial == null) {
 				// An orbit without the fade
 				markerMaterial = new Material(MapView.fetch.orbitLinesMaterial);
 				markerMaterial.SetFloat("_FadeStrength", 0f);
 			}
 			line.material = markerMaterial;
-			line.startColor = line.endColor = color;
 			return line;
 		}
 
@@ -108,27 +113,30 @@ namespace PlanningNode {
 			return body.sphereOfInfluence * direction.normalized;
 		}
 
-		private void UpdateRing(LineRenderer line, Vector3d center, double radius, Vector3d direction)
+		private void UpdateRing(LineRenderer line, Vector3d center, double radius, Vector3d direction, float camDist, float thickness, Color color)
 		{
-			var camDist = cameraDist(center);
 			if (camDist > 0) {
-				line.positionCount = Math.Min(96, Math.Max(16, 12 + 50000 / ((int)camDist + 1)));
+				line.positionCount = Math.Min(96, Math.Max(16, 12 + 50000 / ((int)camDist + 1))) / 4 * 4;
+				var poses = new Vector3[line.positionCount];
+				int quadLen = line.positionCount / 4;
 				Vector3d dX = radius * Vector3d.Cross(
 					direction,
 					(direction.x != 0 || direction.z != 0) ? Vector3d.up : Vector3d.forward
 				).normalized;
 				Vector3d dY = radius * Vector3d.Cross(direction, dX).normalized;
-				var poses = new Vector3[line.positionCount];
-				for (int i = 0; i < line.positionCount; ++i) {
+				for (int i = 0; i < quadLen; ++i) {
+					// Make a circle 4 points at a time to reduce trig calls
 					float theta = 2f * Mathf.PI * i / line.positionCount;
-					poses[i] = ScaledSpace.LocalToScaledSpace(
-						center + Mathf.Cos(theta) * dX + Mathf.Sin(theta) * dY
-					);
+					float cosTheta = Mathf.Cos(theta);
+					float sinTheta = Mathf.Sin(theta);
+					poses[i              ] = ScaledSpace.LocalToScaledSpace(center + cosTheta * dX + sinTheta * dY);
+					poses[i +     quadLen] = ScaledSpace.LocalToScaledSpace(center - sinTheta * dX + cosTheta * dY);
+					poses[i + 2 * quadLen] = ScaledSpace.LocalToScaledSpace(center - cosTheta * dX - sinTheta * dY);
+					poses[i + 3 * quadLen] = ScaledSpace.LocalToScaledSpace(center + sinTheta * dX - cosTheta * dY);
 				}
 				line.SetPositions(poses);
-				// Thin lines at a distance, slightly thicker up close
-				line.startWidth = line.endWidth = 0.05f * (float)Math.Sqrt(2 * camDist);
-				line.loop       = true;
+				line.startColor = line.endColor = color;
+				line.startWidth = line.endWidth = thickness;
 				line.enabled    = true;
 			} else {
 				// Can't see, don't draw old fragments
@@ -153,9 +161,6 @@ namespace PlanningNode {
 		private readonly GUIStyle labelStyle = new GUIStyle() {
 			alignment = TextAnchor.MiddleCenter,
 			richText  = true,
-			normal    = new GUIStyleState() {
-				textColor = UnityEngine.Random.ColorHSV(0, 1, 0.5f, 0.5f, 0.75f, 0.75f),
-			},
 		};
 
 		private static Material markerMaterial;

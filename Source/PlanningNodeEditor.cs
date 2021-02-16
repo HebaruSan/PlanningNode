@@ -239,6 +239,7 @@ namespace PlanningNode {
 		{
 			if (solver != null && solver.targetBody != FlightGlobals.ActiveVessel?.targetObject as CelestialBody) {
 				solver.targetBody = FlightGlobals.ActiveVessel?.targetObject as CelestialBody;
+				editingNode.color = PlanningNodeModel.GetBodyColor(solver.targetBody);
 				targeter.SetTarget(solver.targetBody?.orbitDriver);
 				solver.UpdateFlightPlan();
 			}

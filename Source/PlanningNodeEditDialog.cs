@@ -89,6 +89,25 @@ namespace PlanningNode {
 					tooltipText = canEdit ? "PlanningNode_NextNodeTooltip" : "PlanningNode_NextNodeViewOnlyTooltip"
 				})
 			));
+			AddChild(new DialogGUIHorizontalLayout(
+				-1, -1, pad, new RectOffset(0, 0, 0, 0), TextAnchor.MiddleLeft,
+				new DialogGUILabel("PlanningNode_HueLabelCaption", buttonWidth / 2),
+				new DialogGUISlider(
+					() => {
+						if (editingNode != null) {
+							Color.RGBToHSV(editingNode.color, out float hue, out float _, out float _);
+							return hue;
+						}
+						return 0f;
+					},
+					0f, 1f, false, -1, buttonHeight,
+					v => {
+						if (editingNode != null) {
+							editingNode.color = Color.HSVToRGB(v, 0.5f, 0.75f);
+						}
+					}
+				)
+			));
 			if (canEdit) {
 				AddChild(new DialogGUIHorizontalLayout(
 					-1, -1, pad, new RectOffset(0, 0, 0, 0), TextAnchor.MiddleLeft,
@@ -114,8 +133,6 @@ namespace PlanningNode {
 						tooltipText = "PlanningNode_NextBodyTooltip"
 					})
 				));
-			}
-			if (canEdit) {
 				AddChild(TooltipExtensions.DeferTooltip(new DialogGUIToggle(
 					() => editingNode.vessel == null,
 					"PlanningNode_ShowForAllCheckboxCaption",
@@ -239,6 +256,16 @@ namespace PlanningNode {
 			return tex;
 		}
 
+		private static Texture2D GradientTexture(int w, Func<int, Color> colorFunc)
+		{
+			Texture2D tex = new Texture2D(w, 1, TextureFormat.ARGB32, false);
+			for (int x = 0; x < w; ++x) {
+				tex.SetPixel(x, 0, colorFunc(x));
+			}
+			tex.Apply();
+			return tex;
+		}
+
 		private static Sprite SpriteFromTexture(Texture2D tex)
 		{
 			return tex == null ? null : Sprite.Create(
@@ -264,16 +291,15 @@ namespace PlanningNode {
 
 		private static readonly UIStyleState winState = new UIStyleState() {
 			background = SpriteFromTexture(SolidColorTexture(new Color(0.15f, 0.15f, 0.15f, 0.8f))),
-			textColor  = Color.HSVToRGB(0.3f, 0.8f, 0.8f)
+			textColor  = Color.HSVToRGB(0.3f, 0.8f, 0.8f),
 		};
 
-		private static readonly UISkinDef skin = new UISkinDef() {
+		private static readonly UIStyleState sliderState = new UIStyleState() {
+			background = SpriteFromTexture(GradientTexture(128, x => Color.HSVToRGB(x / 128f, 0.5f, 0.66f))),
+		};
+
+		private static readonly UISkinDef skin = new CloneableUISkinDef(UISkinManager.defaultSkin) {
 			name   = "PlanningNode Skin",
-			box    = UISkinManager.defaultSkin.box,
-			font   = UISkinManager.defaultSkin.font,
-			label  = UISkinManager.defaultSkin.label,
-			toggle = UISkinManager.defaultSkin.toggle,
-			button = UISkinManager.defaultSkin.button,
 			window = new UIStyle() {
 				normal    = winState,
 				active    = winState,
@@ -283,6 +309,12 @@ namespace PlanningNode {
 				fontSize  = UISkinManager.defaultSkin.window.fontSize,
 				fontStyle = FontStyle.Bold,
 			},
+			horizontalSlider = new UIStyle() {
+				normal    = sliderState,
+				active    = sliderState,
+				disabled  = sliderState,
+				highlight = sliderState,
+			}
 		};
 
 		private const int pad           =   8;

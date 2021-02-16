@@ -22,6 +22,10 @@ namespace PlanningNode {
 			cfg.TryGetValue("name",     ref name);
 			cfg.TryGetValue("burnTime", ref burnTime);
 			cfg.TryGetValue("deltaV",   ref deltaV);
+			if (!cfg.TryGetValue("color", ref color)) {
+				// No saved color, pick one randomly
+				color = GetBodyColor(null);
+			}
 			uint vesId = 0;
 			if (cfg.TryGetValue("vessel", ref vesId)) {
 				vesselId = vesId;
@@ -39,6 +43,26 @@ namespace PlanningNode {
 			this.vessel = vessel;
 			burnTime    = Planetarium.GetUniversalTime() + origin.orbit.period / 8;
 			deltaV      = new Vector3d(0, 0, 0);
+			color       = GetBodyColor(FlightGlobals.ActiveVessel?.targetObject as CelestialBody);
+		}
+
+		/// <summary>
+		/// Find the orbit color associated with the given body,
+		/// or make a random one
+		/// </summary>
+		/// <param name="b">The body to check</param>
+		/// <returns>
+		/// Body's orbit color or a random one if not found
+		/// </returns>
+		public static Color GetBodyColor(CelestialBody b)
+		{
+			if (b == null) {
+				return UnityEngine.Random.ColorHSV(0, 1, 0.5f, 0.5f, 0.75f, 0.75f);
+			} else {
+				// Return the hue at a standardized brightness
+				Color.RGBToHSV(b.orbitDriver.Renderer.orbitColor, out float hue, out float sat, out float val);
+				return Color.HSVToRGB(hue, sat, Mathf.Max(0.75f, val));
+			}
 		}
 
 		/// <summary>
@@ -76,6 +100,11 @@ namespace PlanningNode {
 
 		private uint? vesselId;
 
+		/// <summary>
+		/// The node marker's color
+		/// </summary>
+		public Color color;
+
 		/// <returns>
 		/// A ConfigNode representing this node
 		/// </returns>
@@ -86,7 +115,8 @@ namespace PlanningNode {
 			cfg.AddValue("origin",   origin.bodyName);
 			cfg.AddValue("burnTime", burnTime);
 			cfg.AddValue("deltaV",   deltaV);
-			if (vessel != null) {
+			cfg.AddValue("color",    color);
+			if (vesselId.HasValue) {
 				cfg.AddValue("vessel", vesselId);
 			}
 			return cfg;

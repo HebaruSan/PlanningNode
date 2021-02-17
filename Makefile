@@ -5,7 +5,7 @@ PROJECT:=PlanningNode
 SOURCEDIR:=Source
 SOURCE:=$(wildcard $(SOURCEDIR)/*.cs $(SOURCEDIR)/*/*.cs $(SOURCEDIR)/*.csproj)
 GAMELINK:=$(SOURCEDIR)/KSP_Data
-DEFAULTGAMEDIR:=$(HOME)/.local/share/Steam/steamapps/common/Kerbal Space Program
+DEFAULTGAMEDIR:=$(HOME)/.local/share/Steam/steamapps/common/Kerbal\ Space\ Program
 
 DISTDIR:=GameData/$(PROJECT)
 STATICS:=$(wildcard $(DISTDIR)/* $(DISTDIR)/*/*)
@@ -23,9 +23,9 @@ $(DLL): $(GAMELINK) $(SOURCE)
 	cd $(SOURCEDIR) && msbuild /r
 
 $(GAMELINK):
-	@if [ -x "$(DEFAULTGAMEDIR)" ]; \
+	@if [ -x $(DEFAULTGAMEDIR) ]; \
 	then \
-		ln -s "$(DEFAULTGAMEDIR)"/KSP_Data $@; \
+		ln -s $(DEFAULTGAMEDIR)/KSP_Data $@; \
 	else \
 		echo "$@ not found."; \
 		echo 'This must be a symlink to Kerbal Space Program/KSP_Data.'; \

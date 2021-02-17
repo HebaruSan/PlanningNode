@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.Events;
 using KSP.Localization;
 using TMPro;
 
@@ -58,14 +59,18 @@ namespace PlanningNode {
 			AddChild(new DialogGUIHorizontalLayout(
 				-1, -1, pad, new RectOffset(0, 0, 0, 0), TextAnchor.MiddleLeft,
 				new DialogGUILabel("PlanningNode_NameLabelCaption", buttonWidth / 2),
-				new DialogGUITextInput(
-					editingNode.name,
-					false,
-					24,
-					s  => { return editingNode.name = s; },
-					() => { return editingNode.name;     },
-					TMP_InputField.ContentType.Standard,
-					buttonHeight
+				NotifyOnFocus(new DialogGUITextInput(
+						editingNode.name,
+						false,
+						24,
+						s  => { return editingNode.name = s; },
+						() => { return editingNode.name;     },
+						TMP_InputField.ContentType.Standard,
+						buttonHeight
+					),
+					// Don't trigger other parts of the game while they're typing a name in the text field
+					v => InputLockManager.SetControlLock(MyLocks, "PlanningNodeEditDialogName"),
+					v => InputLockManager.RemoveControlLock("PlanningNodeEditDialogName")
 				),
 				TooltipExtensions.DeferTooltip(new DialogGUIButton(
 					"PlanningNode_PrevNodeCaption",
@@ -188,7 +193,6 @@ namespace PlanningNode {
 				skin,
 				false
 			);
-			InputLockManager.SetControlLock(MyLocks, "PlanningNodeEditDialogName");
 			return dialog;
 		}
 
@@ -245,6 +249,19 @@ namespace PlanningNode {
 			);
 		}
 
+		private DialogGUITextInput NotifyOnFocus(DialogGUITextInput txt, UnityAction<string> focused, UnityAction<string> blurred)
+		{
+			txt.OnUpdate = () => {
+				TMP_InputField inpF = txt?.uiItem?.GetComponent<TMP_InputField>();
+				if (inpF != null) {
+					inpF.onSelect.AddListener(focused);
+					inpF.onDeselect.AddListener(blurred);
+					txt.OnUpdate = () => {};
+				}
+			};
+			return txt;
+		}
+
 		private static readonly UIStyleState winState = new UIStyleState() {
 			background = SpriteFromTexture(SolidColorTexture(new Color(0.15f, 0.15f, 0.15f, 0.8f))),
 			textColor  = Color.HSVToRGB(0.3f, 0.8f, 0.8f)
@@ -275,10 +292,14 @@ namespace PlanningNode {
 		private const int dialogWidth   = 300;
 		private const int dialogHeight  =  -1;
 
-		private const ControlTypes MyLocks = ControlTypes.ALL_SHIP_CONTROLS | ControlTypes.TIMEWARP
-			| ControlTypes.MISC | ControlTypes.EVA_INPUT | ControlTypes.MAP
-			| ControlTypes.STAGING | ControlTypes.THROTTLE
-			| ControlTypes.ACTIONS_ALL | ControlTypes.GROUPS_ALL | ControlTypes.CUSTOM_ACTION_GROUPS;
+		private const ControlTypes MyLocks =
+			ControlTypes.ALL_SHIP_CONTROLS | ControlTypes.EVA_INPUT
+			| ControlTypes.ACTIONS_ALL     | ControlTypes.GROUPS_ALL
+			| ControlTypes.THROTTLE        | ControlTypes.TIMEWARP
+			| ControlTypes.MISC            // Stage locking (mod-L)
+			| ControlTypes.MAP_TOGGLE      // M
+			| ControlTypes.STAGING         // Space
+			| ControlTypes.CAMERACONTROLS; // Backspace
 
 		private readonly List<CelestialBody> allowedBodies = new List<CelestialBody>();
 

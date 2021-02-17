@@ -164,8 +164,7 @@ namespace PlanningNode {
 					node.attachedGizmo.OnGizmoUpdated -= OnGizmoUpdated;
 					node.DetachGizmo();
 				}
-				node.scaledSpaceTarget?.uiNode?.Terminate();
-				solver?.RemoveManeuverNode(node);
+				node.RemoveSelf();
 				node = null;
 			}
 		}

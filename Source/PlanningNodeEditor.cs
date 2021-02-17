@@ -137,7 +137,7 @@ namespace PlanningNode {
 
 		private void OnManeuverNodeSelected()
 		{
-			if (node.attachedGizmo != null) {
+			if (node?.attachedGizmo != null) {
 				// It's ours, get notified
 				node.attachedGizmo.OnGizmoUpdated += OnGizmoUpdated;
 			} else {
@@ -148,6 +148,7 @@ namespace PlanningNode {
 
 		private void OnDisable()
 		{
+			GameEvents.onManeuverNodeSelected.Remove(OnManeuverNodeSelected);
 			DestroyNode();
 			Destroy(fakeVessel);
 			Destroy(targeter);

@@ -211,17 +211,33 @@ namespace PlanningNode {
 			CelestialBody targetBody = FlightGlobals.fetch.VesselTarget as CelestialBody;
 			if (targetBody != null && targetBody.orbit.referenceBody == driver.orbit.referenceBody) {
 				// Zoom to target body's orbit if larger
-				semiMajorAxis = Math.Max(semiMajorAxis,
-				                         (float)targetBody.orbit.semiMajorAxis);
+				semiMajorAxis = SaneMax(semiMajorAxis,
+				                        (float)targetBody.orbit.semiMajorAxis);
 			}
 			if (solver?.flightPlan != null) {
 				for (int i = 0; i < solver.flightPlan.Count; ++i) {
 					// Zoom to planned orbit if larger
-					semiMajorAxis = Math.Max(semiMajorAxis,
-					                         (float)solver.flightPlan[i].semiMajorAxis);
+					semiMajorAxis = SaneMax(semiMajorAxis,
+					                        (float)solver.flightPlan[i].semiMajorAxis);
 				}
 			}
 			return semiMajorAxis / 3000f;
+		}
+
+		/// <summary>
+		/// Returns the greater of two floats in a non-insane way.
+		/// Math.Max(10, NaN) = NaN, which means you can't use it to
+		/// find the largest value in a sequence that might contain NaN.
+		/// </summary>
+		/// <param name="a">One of the values</param>
+		/// <param name="b">The other value</param>
+		/// <returns>
+		/// The greater of the two values.
+		/// Only returns NaN if BOTH are NaN, unlike Math.Max.
+		/// </returns>
+		private float SaneMax(float a, float b)
+		{
+			return float.IsNaN(a) ? b : float.IsNaN(b) ? a : Mathf.Max(a, b);
 		}
 
 		private void Update()

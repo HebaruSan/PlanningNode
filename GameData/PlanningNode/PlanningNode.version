@@ -1,7 +1,7 @@
 {
 	"NAME": "Planning Node",
 	"URL": "https://raw.githubusercontent.com/HebaruSan/PlanningNode/master/GameData/PlanningNode/PlanningNode.version",
-	"DOWNLOAD": "https://github.com/HebaruSan/PlanningNode/releases/download/v0.1.1/PlanningNode.zip",
+	"DOWNLOAD": "https://github.com/HebaruSan/PlanningNode/releases/download/v0.1.2/PlanningNode.zip",
 	"GITHUB": {
 		"USERNAME": "HebaruSan",
 		"REPOSITORY": "PlanningNode",
@@ -10,7 +10,7 @@
 	"VERSION": {
 		"MAJOR": 0,
 		"MINOR": 1,
-		"PATCH": 1
+		"PATCH": 2
 	},
 	"KSP_VERSION_MIN": {
 		"MAJOR": 1,

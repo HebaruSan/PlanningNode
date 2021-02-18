@@ -118,7 +118,7 @@ namespace PlanningNode {
 					),
 					TooltipExtensions.DeferTooltip(new DialogGUIButton(
 						"PlanningNode_PrevBodyCaption",
-						() => { editingNode.origin = prevBody(editingNode.origin); },
+						() => BodyChanged?.Invoke(prevBody(editingNode.origin)),
 						smallBtnWidth, buttonHeight,
 						false
 					) {
@@ -126,7 +126,7 @@ namespace PlanningNode {
 					}),
 					TooltipExtensions.DeferTooltip(new DialogGUIButton(
 						"PlanningNode_NextBodyCaption",
-						() => { editingNode.origin = nextBody(editingNode.origin); },
+						() => BodyChanged?.Invoke(nextBody(editingNode.origin)),
 						smallBtnWidth, buttonHeight,
 						false
 					) {
@@ -180,6 +180,11 @@ namespace PlanningNode {
 		/// Function to call when the user clicks the button to edit the next node node
 		/// </summary>
 		public event Action NextNode;
+
+		/// <summary>
+		/// Function to call when the user changes the starting body
+		/// </summary>
+		public event Action<CelestialBody> BodyChanged;
 
 		/// <summary>
 		/// Create a dialog and display it

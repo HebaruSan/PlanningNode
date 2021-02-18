@@ -192,11 +192,18 @@ namespace PlanningNode {
 				};
 				editDialog.PrevNode += () => editNode(PlanningNodesManager.Instance.PrevNode(renderer.vessel, editDialog.editingNode));
 				editDialog.NextNode += () => editNode(PlanningNodesManager.Instance.NextNode(renderer.vessel, editDialog.editingNode));
+				editDialog.BodyChanged += OnBodyChanged;
 				editDialog.Show(launcher.GetAnchor());
 			} else {
 				// Already open, just switch to this node
 				editDialog.editingNode = toEdit;
 			}
+		}
+
+		private void OnBodyChanged(CelestialBody b)
+		{
+			editDialog.editingNode.origin = b;
+			editNode(editDialog.editingNode);
 		}
 
 		private void OnNodeDeleted()

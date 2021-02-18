@@ -71,7 +71,9 @@ namespace PlanningNode {
 				var screenWhere = PlanetariumCamera.Camera.WorldToScreenPoint(
 					ScaledSpace.LocalToScaledSpace(textWhere));
 
-				if (screenWhere.z > 0) {
+				if (screenWhere.z > 0
+					&& screenWhere.x >= 0 && screenWhere.x <= Screen.width
+					&& screenWhere.y >= 0 && screenWhere.y <= Screen.height) {
 					// In front of camera, so draw
 
 					var camDist = cameraDist(textWhere);
@@ -87,6 +89,19 @@ namespace PlanningNode {
 							EditMe?.Invoke(myNode);
 						}
 					}
+				} else {
+					Vector2 edgePos = (screenWhere.z < 0 ? -1f : 1f) * screenRadius * (
+						new Vector2(screenWhere.x - Screen.width / 2, Screen.height / 2 - screenWhere.y).normalized
+					);
+					GUI.Label(
+						new Rect(
+							Mathf.Clamp(Screen.width  / 2 + edgePos.x, 50, Screen.width  - 100),
+							Mathf.Clamp(Screen.height / 2 + edgePos.y, 50, Screen.height -  50),
+							100, 30
+						),
+						myNode.GetCaption(vessel),
+						labelStyle
+					);
 				}
 			}
 		}
@@ -154,6 +169,8 @@ namespace PlanningNode {
 
 		// Scale the markers to the size of their containing SOI
 		private float ringScale => 0.006f * (float)(myNode?.origin?.sphereOfInfluence ?? 84000000);
+
+		private readonly float screenRadius = 0.5f * Mathf.Sqrt(Screen.width * Screen.width + Screen.height * Screen.height);
 
 		private Vessel   vessel;
 		private Vector3d where;

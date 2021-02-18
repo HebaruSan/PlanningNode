@@ -56,8 +56,8 @@ namespace PlanningNode {
 				textWhere = where - ringScale * direction;
 
 				float camDist   = cameraDist(where);
-				// Thin lines at a distance, slightly thicker up close
-				float thickness = 0.05f * (float)Math.Sqrt(2 * camDist);
+				// Thin lines at a distance, slightly thicker up close, thicker for bigger SOIs
+				float thickness = (camDist + ringScale) / 24000f;
 
 				UpdateRing(line1, where - 2 * ringScale * direction, 3 * ringScale, direction, camDist, thickness, myNode.color);
 				UpdateRing(line2, where -     ringScale * direction, 2 * ringScale, direction, camDist, thickness, myNode.color);
@@ -152,7 +152,8 @@ namespace PlanningNode {
 			);
 		}
 
-		private const float ringScale = 500000;
+		// Scale the markers to the size of their containing SOI
+		private float ringScale => 0.006f * (float)(myNode?.origin?.sphereOfInfluence ?? 84000000);
 
 		private Vessel   vessel;
 		private Vector3d where;

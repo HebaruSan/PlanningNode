@@ -141,6 +141,14 @@ namespace PlanningNode {
 					tooltipText = "PlanningNode_ShowForAllCheckboxTooltip"
 				}));
 			}
+			AddChild(TooltipExtensions.DeferTooltip(new DialogGUIButton(
+				"PlanningNode_WarpToCaption",
+				() => WarpTo?.Invoke(editingNode),
+				buttonWidth, buttonHeight,
+				false
+			) {
+				tooltipText = "PlanningNode_WarpToTooltip"
+			}));
 
 			// Don't try to plot a maneuver from the Sun
 			for (int i = 0; i < FlightGlobals.Bodies.Count; ++i) {
@@ -185,6 +193,11 @@ namespace PlanningNode {
 		/// Function to call when the user changes the starting body
 		/// </summary>
 		public event Action<CelestialBody> BodyChanged;
+
+		/// <summary>
+		/// Function to call when the user clicks to warp to the current node
+		/// </summary>
+		public event Action<PlanningNodeModel> WarpTo;
 
 		/// <summary>
 		/// Create a dialog and display it

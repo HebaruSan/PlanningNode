@@ -158,6 +158,8 @@ namespace PlanningNode {
 			}
 		}
 
+		#endregion App launcher
+
 		private void editNode(PlanningNodeModel toEdit)
 		{
 			if (editor != null) {
@@ -193,6 +195,7 @@ namespace PlanningNode {
 				editDialog.PrevNode += () => editNode(PlanningNodesManager.Instance.PrevNode(renderer.vessel, editDialog.editingNode));
 				editDialog.NextNode += () => editNode(PlanningNodesManager.Instance.NextNode(renderer.vessel, editDialog.editingNode));
 				editDialog.BodyChanged += OnBodyChanged;
+				editDialog.WarpTo += WarpTo;
 				editDialog.Show(launcher.GetAnchor());
 			} else {
 				// Already open, just switch to this node
@@ -232,7 +235,41 @@ namespace PlanningNode {
 			}
 		}
 
-		#endregion App launcher
+		private void WarpTo(PlanningNodeModel node)
+		{
+			if (TimeWarp.CurrentRate > 1) {
+				TimeWarp.fetch.CancelAutoWarp();
+				TimeWarp.SetRate(0, false);
+			} else {
+				TimeWarp.fetch.WarpTo(node.burnTime - WarpBuffer(node.origin, (float?)renderer.vessel?.orbit.ApA ?? 100000f));
+			}
+		}
+
+		/// <summary>
+		/// Calculate a good buffer for transferring from the given orbit
+		/// </summary>
+		/// <param name="parent">Body we're orbiting</param>
+		/// <param name="apoapsis">Furthest distance from parent</param>
+		/// <returns>
+		/// One fourth the orbital period of a transfer orbit from your apoapsis to the edge of the sphere of influence;
+		/// From LKO this is about 10d, and escaping to Duna takes 3d
+		/// </returns>
+		private static float WarpBuffer(CelestialBody parent, float apoapsis)
+		{
+			return 0.25f * OrbitalPeriod(parent, (float)parent.sphereOfInfluence, apoapsis);
+		}
+
+		/// <returns>
+		/// Period of an orbit with the given characteristics.
+		/// </returns>
+		/// <param name="parent">Body around which to orbit</param>
+		/// <param name="apoapsis">Greatest distance from center of parent</param>
+		/// <param name="periapsis">Smallest distance from center of parent</param>
+		public static float OrbitalPeriod(CelestialBody parent, float apoapsis, float periapsis)
+		{
+			float r = 0.5f * (apoapsis + periapsis);
+			return 2 * Mathf.PI * Mathf.Sqrt(r * r * r / (float)parent.gravParameter);
+		}
 
 		/// <summary>
 		/// Manages the drawing of the markers

@@ -127,13 +127,13 @@ namespace PlanningNode {
 		private void onAppLaunchToggleOn()
 		{
 			// Make a node if needed
-			var nodes = PlanningNodesManager.Instance.NodesFor(FlightGlobals.ActiveVessel, true);
+			var nodes = PlanningNodesManager.Instance.NodesFor(renderer.vessel, true);
 			if (nodes.Count < 1 && CanEdit) {
 				PlanningNodesManager.Instance.nodes.Add(new PlanningNodeModel(
-					FlightGlobals.ActiveVessel?.mainBody ?? FlightGlobals.GetHomeBody(),
-					FlightGlobals.ActiveVessel));
+					renderer.vessel?.mainBody ?? FlightGlobals.GetHomeBody(),
+					renderer.vessel));
 
-				nodes = PlanningNodesManager.Instance.NodesFor(FlightGlobals.ActiveVessel, true);
+				nodes = PlanningNodesManager.Instance.NodesFor(renderer.vessel, true);
 			}
 			if (nodes.Count > 0) {
 				editNode(nodes[0]);
@@ -181,8 +181,8 @@ namespace PlanningNode {
 				editDialog.CloseDialog += () => launcher.SetFalse(true);
 				editDialog.NewNode += () => {
 					var nd = new PlanningNodeModel(
-						FlightGlobals.ActiveVessel?.mainBody ?? FlightGlobals.GetHomeBody(),
-						FlightGlobals.ActiveVessel);
+						renderer.vessel?.mainBody ?? FlightGlobals.GetHomeBody(),
+						renderer.vessel);
 					PlanningNodesManager.Instance.nodes.Add(nd);
 					editNode(nd);
 				};
@@ -239,8 +239,8 @@ namespace PlanningNode {
 		/// </summary>
 		protected PlanningNodeMarkersRenderer renderer   = null;
 
-		private PlanningNodeEditor          editor     = null;
-		private PlanningNodeEditDialog      editDialog = null;
+		private PlanningNodeEditor     editor     = null;
+		private PlanningNodeEditDialog editDialog = null;
 	}
 
 }

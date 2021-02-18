@@ -38,6 +38,10 @@
     <Reference Include="System.Xml">
       <Private>false</Private>
     </Reference>
+    <Reference Include="System.Core">
+      <HintPath>KSP_Data\Managed\System.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="KSPAssets">
       <HintPath>KSP_Data\Managed\KSPAssets.dll</HintPath>
       <Private>false</Private>

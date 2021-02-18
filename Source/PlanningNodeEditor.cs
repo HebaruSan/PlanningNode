@@ -200,8 +200,19 @@ namespace PlanningNode {
 			if (origCamTarget != null) {
 				MapView.MapCamera.SetTarget(origCamTarget);
 				MapView.MapCamera.SetDistance(origCamDist);
+				if (editingNode.origin == (origCamTarget.celestialBody ?? origCamTarget.vessel?.mainBody)) {
+					LookAtMarker();
+				}
 				origCamTarget = null;
 			}
+		}
+
+		private void LookAtMarker()
+		{
+			var dir = (Vector3)editingNode.BurnDirection();
+			PlanetariumCamera.fetch.camHdg = Mathf.Atan2(dir.x, dir.z)
+				- Mathf.Deg2Rad * (float)Planetarium.fetch.inverseRotAngle;
+			PlanetariumCamera.fetch.camPitch = -Mathf.Asin(dir.y) + 6f * Mathf.Deg2Rad;
 		}
 
 		private float ZoomDistance()

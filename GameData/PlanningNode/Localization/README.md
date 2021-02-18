@@ -36,7 +36,7 @@ Follow these steps to make improvements to an existing translation:
 
 Follow these steps to start your own translation from scratch:
 
-4. Make a copy of `en-us.cfg` in the `lang` folder
+4. Make a copy of `en-us.cfg` in the `Localization` folder
 5. Rename the file according to the list of languages above
 6. Edit the file for your language in your favorite text editor
 7. Change the third line from `en-us` to the string for your language

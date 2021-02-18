@@ -31,12 +31,12 @@ Planning nodes can be edited in the map view and viewed in the tracking station.
 4. Click the Planning Node icon in the toolbar (![icon](Icons/PlanningNode.png)). A planning node will be created and opened for editing, and the view will zoom to display it.
 
    ![created]
-5. Use the node editing tools to set up the transfer you wish to perform (drag the node, add prograde/normal/radial components, etc.). You can also choose a name for this transfer and determine whether it should be shown for all vessels or just the current vessel in the editing window next to the toolbar button.
+5. Use the node editing tools to set up the transfer you wish to perform (drag the node, add prograde/normal/radial components, etc.). You can also choose a name and color for this transfer and determine whether it should be shown for all vessels or just the current vessel in the editing window next to the toolbar button.
 
    ![transfer]
 
    ![renamed]
-6. Click the close button in the Planning Node window or click the toolbar button again. The view will zoom back to your craft, and a three-ring marker will appear showing the time and excess V needed to execute your transfer. You might have to pan around to find it if it isn't immediately in front of the camera. (Note that the excess V is **not** your burn delta V, but rather how much faster than escape velocity you need to go.)
+6. Click the close button in the Planning Node window or click the toolbar button again. The view will zoom back to your craft, and a three-ring marker will appear showing the time and excess V needed to execute your transfer. (Note that the excess V is **not** your burn delta V, but rather how much faster than escape velocity you need to go.)
 
    ![marker]
 7. Create a stock maneuver node and increase its delta V until you are escaping the current sphere of influence; the planning node's timing and excess V displays will switch from absolute values to the difference between them and your current escape.

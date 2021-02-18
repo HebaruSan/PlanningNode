@@ -145,7 +145,7 @@ namespace PlanningNode {
 			// Don't try to plot a maneuver from the Sun
 			for (int i = 0; i < FlightGlobals.Bodies.Count; ++i) {
 				var b = FlightGlobals.Bodies[i];
-				if (b.referenceBody != null) {
+				if (b.referenceBody != null && b.referenceBody != b) {
 					allowedBodies.Add(b);
 				}
 			}

@@ -69,8 +69,10 @@ Other notes:
 
 [Donation image]: https://i.imgur.com/M9m07Qw.png
 
-<!--
 ## Acknowledgements
 
-So far there are no translations, but this section should exist.
--->
+Special thanks to all those who have helped to translate Planning Node to additional languages!
+
+Language | Translators
+:--      | :--
+Chinese  | [AllenLi](https://github.com/AllenLi777)

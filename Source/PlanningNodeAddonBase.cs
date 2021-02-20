@@ -265,7 +265,7 @@ namespace PlanningNode {
 		/// <param name="parent">Body around which to orbit</param>
 		/// <param name="apoapsis">Greatest distance from center of parent</param>
 		/// <param name="periapsis">Smallest distance from center of parent</param>
-		public static float OrbitalPeriod(CelestialBody parent, float apoapsis, float periapsis)
+		private static float OrbitalPeriod(CelestialBody parent, float apoapsis, float periapsis)
 		{
 			float r = 0.5f * (apoapsis + periapsis);
 			return 2 * Mathf.PI * Mathf.Sqrt(r * r * r / (float)parent.gravParameter);

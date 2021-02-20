@@ -158,10 +158,8 @@ namespace PlanningNode {
 		private Tuple<double, double> escapeTimeAndSpeed(Vessel vessel)
 		{
 			var patch = escapePatch(vessel);
-			if (patch != null) {
-				return new Tuple<double, double>(patch.EndUT, patch.getOrbitalVelocityAtUT(patch.EndUT).magnitude);
-			}
-			return null;
+			return patch == null ? null : new Tuple<double, double>(
+				patch.EndUT, patch.getOrbitalVelocityAtUT(patch.EndUT).magnitude);
 		}
 
 		private Orbit escapePatch(Vessel v)

@@ -103,5 +103,34 @@ namespace PlanningNode {
 			return curIdx >= 0 ? nodes[(curIdx + 1) % nodes.Count] : cur;
 		}
 
+		/// <summary>
+		/// Find the planning node for the given vessel and body
+		/// that is the closest to the needed excess V
+		/// </summary>
+		/// <param name="vessel">The vessel we're piloting</param>
+		/// <param name="body">The body we're escaping</param>
+		/// <returns>
+		/// Which node is the closest, if any
+		/// </returns>
+		public PlanningNodeModel ClosestExcessV(Vessel vessel, CelestialBody body)
+		{
+			var nodes = NodesFor(vessel, true);
+			PlanningNodeModel best = null;
+			double? bestDiff = null;
+			for (int i = 0; i < nodes.Count; ++i) {
+				var nd = nodes[i];
+				if (nd.origin == body) {
+					var escPat = nd.escapePatch(vessel);
+					var excessV = escPat.getOrbitalVelocityAtUT(escPat.EndUT);
+					var diff = (nd.BurnExcessV() - excessV).sqrMagnitude;
+					if (!bestDiff.HasValue || diff < bestDiff.Value) {
+						best     = nd;
+						bestDiff = diff;
+					}
+				}
+			}
+			return best;
+		}
+
 	}
 }

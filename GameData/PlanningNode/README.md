@@ -42,7 +42,9 @@ Planning nodes can be edited in the map view and viewed in the tracking station.
 7. Create a stock maneuver node and increase its delta V until you are escaping the current sphere of influence; the planning node's timing and excess V displays will switch from absolute values to the difference between them and your current escape.
 8. It's usually easiest to match the excess V first, so do that. This step is somewhat forgiving; you can often get within a few dozen m/s and call it good enough.
 9. Adjust the time and normal/antinormal handles till your point of escape lines up with the planning node's bulls-eye marker. This tends to be a bit forgiving as well, so don't worry about hitting the exact center. Excitedly use the phrase "five by five" in a sentence.
-10. Right click the node and use the forward/back orbit buttons to match up the times; if you are too early, the planning node will the time difference in the usual format, and if you are too late, the time difference will appear in parentheses. This is the most forgiving step because transfer windows are generally weeks long. Note that the stock controls can require **many** clicks here, so you may want to install a maneuver editing mod (not included).
+10. Right click the node and use the planning node button to adjust the maneuver's time to "hit" the planning node's escape marker.
+
+    ![autotime] ![autotimeHover]
 
     ![escape]
 11. Zoom out to solar orbit to see how close you are to your plan. You may already have an encounter!
@@ -51,6 +53,8 @@ Planning nodes can be edited in the map view and viewed in the tracking station.
 [transfer]: https://raw.githubusercontent.com/HebaruSan/PlanningNode/master/screenshots/transfer.png
 [renamed]: https://raw.githubusercontent.com/HebaruSan/PlanningNode/master/screenshots/renamed.png
 [marker]: https://raw.githubusercontent.com/HebaruSan/PlanningNode/master/screenshots/marker.png
+[autotime]: https://raw.githubusercontent.com/HebaruSan/PlanningNode/master/screenshots/autotime.png
+[autotimeHover]: https://raw.githubusercontent.com/HebaruSan/PlanningNode/master/screenshots/autotimeHover.png
 [escape]: https://raw.githubusercontent.com/HebaruSan/PlanningNode/master/screenshots/escape.png
 
 Other notes:

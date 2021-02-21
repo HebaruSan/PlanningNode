@@ -127,12 +127,39 @@ namespace PlanningNode {
 		/// </returns>
 		public Vector3d BurnDirection()
 		{
+			return BurnExcessV().normalized;
+		}
+
+		/// <returns>
+		/// The burn inside the SOI
+		/// </returns>
+		public Vector3d BurnExcessV()
+		{
 			Vector3d planetPrograde = origin.orbit.getOrbitalVelocityAtUT(burnTime).xzy.normalized;
 			Vector3d planetNormal   = origin.orbit.GetOrbitNormal().xzy.normalized;
 			Vector3d planetRadial   = QuaternionD.AngleAxis(90, planetNormal) * planetPrograde;
 			return (deltaV.z * planetPrograde
 			      + deltaV.y * planetNormal
-			      + deltaV.x * planetRadial).normalized;
+			      + deltaV.x * planetRadial);
+		}
+
+		/// <summary>
+		/// Figure out when a maneuver should be performed to execute this planning node
+		/// </summary>
+		/// <param name="vessel">The vessel we're piloting</param>
+		/// <param name="initialTime">The time of the maneuver the user wants to adjust</param>
+		/// <returns>
+		/// The time when the maneuver should be done, if any.
+		/// Only increases or decreases the current time in multiples
+		/// of the current orbital period.
+		/// If you're not currently on an escape trajectory, returns null.
+		/// </returns>
+		public double? BestManeuverTime(Vessel vessel, double initialTime)
+		{
+			double? currentEscapeTime = escapeTimeAndSpeed(vessel)?.Item1;
+			return !currentEscapeTime.HasValue ? (double?)null
+				: initialTime + vessel.orbit.period
+					* Math.Round((burnTime - currentEscapeTime.Value) / vessel.orbit.period);
 		}
 
 		/// <summary>
@@ -162,7 +189,14 @@ namespace PlanningNode {
 				patch.EndUT, patch.getOrbitalVelocityAtUT(patch.EndUT).magnitude);
 		}
 
-		private Orbit escapePatch(Vessel v)
+		/// <summary>
+		/// Find the future orbit when the given vessel will escape this node's origin body
+		/// </summary>
+		/// <param name="v">Vessel to check</param>
+		/// <returns>
+		/// The orbit found, if any
+		/// </returns>
+		public Orbit escapePatch(Vessel v)
 		{
 			var vesSolv = v?.patchedConicSolver;
 			if (vesSolv != null) {

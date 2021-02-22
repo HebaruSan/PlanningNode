@@ -180,16 +180,16 @@ namespace PlanningNode {
 				origCamTarget = MapView.MapCamera.target;
 				origCamDist   = MapView.MapCamera.Distance;
 			}
-			// Focus grandparent body
-			MapView.MapCamera.SetTarget(
-				PlanetariumCamera.fetch.targets.Find(
-					mapObj => mapObj.celestialBody != null
-						&& mapObj.celestialBody.Equals(driver.orbit.referenceBody)
-				)
-			);
-			// Zoom out (not in!) to size of parent body's orbit
+			var newFocus = PlanetariumCamera.fetch.targets.Find(mapObj =>
+				mapObj.celestialBody != null && mapObj.celestialBody.Equals(driver.orbit.referenceBody));
+			bool sameSOI = newFocus == MapView.MapCamera.target;
+			if (!sameSOI) {
+				// Focus new grandparent body
+				MapView.MapCamera.SetTarget(newFocus);
+			}
+			// Zoom to size of parent body's orbit, only zooming in if changing SOI
 			float dist = ZoomDistance();
-			if (dist > MapView.MapCamera.Distance) {
+			if (!sameSOI || dist > MapView.MapCamera.Distance) {
 				MapView.MapCamera.SetDistance(dist);
 			}
 		}

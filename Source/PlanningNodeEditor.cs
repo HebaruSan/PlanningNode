@@ -56,6 +56,8 @@ namespace PlanningNode {
 			fakeVessel.altitude    = FlightGlobals.GetHomeBody().sphereOfInfluence;
 			fakeVessel.GoOnRails();
 			driver.vessel          = fakeVessel;
+			// Rendezvous achievement expects enabled vessels to have a rootPart
+			fakeVessel.enabled     = false;
 
 			// This calculates the conic patches, including after maneuvers
 			solver            = gameObject.AddComponent<PatchedConicSolver>();

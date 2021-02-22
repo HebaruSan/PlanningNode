@@ -2,6 +2,8 @@
 
 This download contains a mod for Kerbal Space Program. Its goal is to create a stock-alike method for planning interplanetary transfers that preserves the flexibility and "learn by doing" approach of stock maneuver nodes.
 
+Traditional transfer calculators give the user a launch time, delta V, and some angles (sometimes with a porkchop plot, sometimes not). But these come from a solar system model internal to the calculator, not from inputs that the user chose. The novice user cannot see where they came from or how to apply them, or easily tweak the details of the transfer the way they can with normal maneuvers. With Planning Node, the user sets up the transfer they want, and then the mod shows how to execute it, all with familiar stock maneuver tools.
+
 See the [README in the repo] for references and additional acknowledgements.
 
 See the [README in the Localization folder] for instructions for adding or improving translations for languages other than English.

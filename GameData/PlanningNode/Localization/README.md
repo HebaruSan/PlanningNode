@@ -74,7 +74,7 @@ If you do not use Steam, I don't know the steps to choose a language. Contact SQ
 
 ## Contributing your translation for others to use
 
-After you have prepared a `cfg` file for your language and confirmed that it works as you intend, if you are willing to contribute it for redistribution under the GLPv3 license, follow these steps to upload it for inclusion in the main mod distribution:
+After you have prepared a `cfg` file for your language and confirmed that it works as you intend, if you are willing to contribute it for redistribution under the GPLv3 license, follow these steps to upload it for inclusion in the main mod distribution:
 
 1. Log in to [Github](https://github.com); you may need to register an account if you do not already have one
 2. Navigate to the [Localization folder](https://github.com/HebaruSan/PlanningNode/tree/master/GameData/PlanningNode/Localization)

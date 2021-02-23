@@ -68,39 +68,63 @@ namespace PlanningNode {
 		private void OnGUI()
 		{
 			if (myNode != null && textWhere != null) {
-				var screenWhere = PlanetariumCamera.Camera.WorldToScreenPoint(
-					ScaledSpace.LocalToScaledSpace(textWhere));
+				var camDist = cameraDist(textWhere);
+				if (0 < camDist && camDist < ringScale) {
+					var screenWhere = PlanetariumCamera.Camera.WorldToScreenPoint(
+							ScaledSpace.LocalToScaledSpace(textWhere))
+						+ (0.6f * ringScale / camDist + 10) * Vector3.down;
 
-				if (screenWhere.z > 0
-					&& screenWhere.x >= 0 && screenWhere.x <= Screen.width
-					&& screenWhere.y >= 0 && screenWhere.y <= Screen.height) {
-					// In front of camera, so draw
-
-					var camDist = cameraDist(textWhere);
-					if (0 < camDist && camDist < ringScale) {
-						var offset = 0.6f * ringScale / camDist + 10;
-
+					if (screenWhere.z > 0 && viewport.Contains(screenWhere)) {
+						// In front of camera, so draw button
 						labelStyle.normal.textColor = myNode.color;
 						if (GUI.Button(
-							new Rect(screenWhere.x - 50, Screen.height - screenWhere.y + offset, 100, 30),
+							new Rect(
+								screenWhere.x - halfTextWidth,
+								Screen.height - screenWhere.y,
+								textWidth, 30),
 							myNode.GetCaption(vessel),
 							labelStyle
 						)) {
 							EditMe?.Invoke(myNode);
 						}
+					} else {
+						// Off edge of screen or behind camera, draw marker at edge of screen
+						labelStyle.normal.textColor = new Color(
+							myNode.color.r, myNode.color.g, myNode.color.b, 0.6f);
+						var edgePos = edgePosition((screenWhere.z < 0 ? -1f : 1f)
+							* ((Vector2)screenWhere - screenCenterOffset));
+						GUI.Label(
+							new Rect(edgePos.x - halfTextWidth, edgePos.y, textWidth, 30),
+							myNode.GetCaption(vessel),
+							labelStyle
+						);
 					}
-				} else {
-					Vector2 edgePos = (screenWhere.z < 0 ? -1f : 1f) * screenRadius * (
-						new Vector2(screenWhere.x - Screen.width / 2, Screen.height / 2 - screenWhere.y).normalized
+				}
+			}
+		}
+
+		private Vector2 edgePosition(Vector2 fromCenter)
+		{
+			if (fromCenter.x == 0) {
+				// Infinite slope, handle specially
+				return new Vector2(screenCenterOffset.x,
+					fromCenter.y > 0 ? viewport.yMin : viewport.yMax);
+			} else {
+				// Safe to divide by x
+				float slope = fromCenter.y / fromCenter.x;
+				if (slope > viewportSlope || slope < -viewportSlope) {
+					// Top / bottom
+					return new Vector2(
+						Mathf.Clamp(screenCenterOffset.x + fromCenter.y / slope, 
+							viewport.xMin, viewport.xMax),
+						fromCenter.y > 0 ? viewport.yMin : viewport.yMax
 					);
-					GUI.Label(
-						new Rect(
-							Mathf.Clamp(Screen.width  / 2 + edgePos.x, 50, Screen.width  - 100),
-							Mathf.Clamp(Screen.height / 2 + edgePos.y, 50, Screen.height -  50),
-							100, 30
-						),
-						myNode.GetCaption(vessel),
-						labelStyle
+				} else {
+					// Left / right
+					return new Vector2(
+						fromCenter.x < 0 ? viewport.xMin : viewport.xMax,
+						Mathf.Clamp(screenCenterOffset.y - slope * fromCenter.x,
+							viewport.yMin, viewport.yMax)
 					);
 				}
 			}
@@ -167,10 +191,23 @@ namespace PlanningNode {
 			);
 		}
 
+		// Markers must be within this area to be interactable,
+		// otherwise they'll be clipped to its edges
+		private static readonly Rect viewport = new Rect(
+			50, 50, Screen.width - 100, Screen.height - 100);
+
+		private static readonly float viewportSlope = viewport.height / viewport.width;
+
+		private static readonly Vector2 screenCenterOffset = 0.5f * new Vector2(
+			Screen.width, Screen.height);
+
 		// Scale the markers to the size of their containing SOI
 		private float ringScale => 0.006f * (float)(myNode?.origin?.sphereOfInfluence ?? 84000000);
 
 		private readonly float screenRadius = 0.5f * Mathf.Sqrt(Screen.width * Screen.width + Screen.height * Screen.height);
+
+		private const float textWidth     = 100f;
+		private const float halfTextWidth = 0.5f * textWidth;
 
 		private Vessel   vessel;
 		private Vector3d where;

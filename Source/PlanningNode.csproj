@@ -26,7 +26,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DebugSymbols>false</DebugSymbols>
     <DebugType>None</DebugType>
-    <DocumentationFile>$(OutDir)$(AssemblyName).xml</DocumentationFile>
+    <DocumentationFile>$(IntermediateOutputPath)$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System">
@@ -80,6 +80,9 @@
     </Reference>
   </ItemGroup>
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+  <Target Name="DeleteXMLDocs" AfterTargets="Build">
+    <Delete Files="$(OutDir)$(AssemblyName).xml" />
+  </Target>
   <Target Name="MakeZip">
     <PropertyGroup>
       <Changelog>$([System.IO.File]::ReadAllText($(ChangelogFile)))</Changelog>

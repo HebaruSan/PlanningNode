@@ -89,6 +89,11 @@ namespace PlanningNode {
 
 			conicRenderer.solver = solver;
 
+			// Just in case the vessel makes its own stuff
+			fakeVessel.DetachPatchedConicsSolver();
+			fakeVessel.patchedConicSolver   = solver;
+			fakeVessel.patchedConicRenderer = conicRenderer;
+
 			StartCoroutine(SwitchTo(editingNode));
 		}
 
@@ -106,7 +111,7 @@ namespace PlanningNode {
 
 			editingNode = newNode;
 
-			driver.orbit = new Orbit(
+			driver.orbit.SetOrbit(
 				editingNode.origin.orbit.inclination,
 				editingNode.origin.orbit.eccentricity,
 				editingNode.origin.orbit.semiMajorAxis,
@@ -120,8 +125,11 @@ namespace PlanningNode {
 			yield return new WaitForEndOfFrame();
 
 			node = solver.AddManeuverNode(editingNode.burnTime);
-			node.DeltaV = editingNode.deltaV;
-			solver.UpdateFlightPlan();
+			// Don't need to update plan for zero dV (new) node
+			if (editingNode.deltaV != node.DeltaV) {
+				node.DeltaV = editingNode.deltaV;
+				solver.UpdateFlightPlan();
+			}
 			if (canEdit) {
 				node.AttachGizmo(MapView.ManeuverNodePrefab, conicRenderer);
 				node.attachedGizmo.OnGizmoUpdated += OnGizmoUpdated;
@@ -151,6 +159,7 @@ namespace PlanningNode {
 		private void OnDisable()
 		{
 			GameEvents.onManeuverNodeSelected.Remove(OnManeuverNodeSelected);
+			origCamTarget = null;
 			DestroyNode();
 			Destroy(fakeVessel);
 			Destroy(targeter);
@@ -269,8 +278,12 @@ namespace PlanningNode {
 			if (solver != null && solver.targetBody != FlightGlobals.ActiveVessel?.targetObject as CelestialBody) {
 				solver.targetBody = FlightGlobals.ActiveVessel?.targetObject as CelestialBody;
 				editingNode.color = PlanningNodeModel.GetBodyColor(solver.targetBody);
-				targeter.SetTarget(solver.targetBody?.orbitDriver);
-				solver.UpdateFlightPlan();
+				if (canEdit) {
+					targeter.SetTarget(solver.targetBody?.orbitDriver);
+				} else {
+					// targeter will call this for us if needed
+					solver.UpdateFlightPlan();
+				}
 			}
 		}
 

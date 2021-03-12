@@ -121,7 +121,7 @@ namespace PlanningNode {
 				var nd = nodes[i];
 				if (nd.origin == body) {
 					var escPat = nd.escapePatch(vessel);
-					var excessV = escPat.getOrbitalVelocityAtUT(escPat.EndUT);
+					var excessV = escPat.getOrbitalVelocityAtUT(escPat.EndUT).xzy;
 					var diff = (nd.BurnExcessV() - excessV).sqrMagnitude;
 					if (!bestDiff.HasValue || diff < bestDiff.Value) {
 						best     = nd;

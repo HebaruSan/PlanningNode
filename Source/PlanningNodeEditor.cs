@@ -39,6 +39,11 @@ namespace PlanningNode {
 
 		private IEnumerator Start()
 		{
+			// Fingers crossed that nobody else does this, or if they do,
+			// that we restore our old references in the right order
+			originalCheckEncounter = PatchedConics.CheckEncounter;
+			PatchedConics.CheckEncounter = MyCheckEncounter;
+
 			// This represents our starting orbit
 			driver                    = gameObject.AddComponent<OrbitDriver>();
 			driver.lowerCamVsSmaRatio = 0.0001f;
@@ -158,6 +163,10 @@ namespace PlanningNode {
 
 		private void OnDisable()
 		{
+			// Put the encounter checker back to normal when we're done
+			PatchedConics.CheckEncounter = originalCheckEncounter;
+			originalCheckEncounter = null;
+
 			GameEvents.onManeuverNodeSelected.Remove(OnManeuverNodeSelected);
 			origCamTarget = null;
 			DestroyNode();
@@ -261,6 +270,30 @@ namespace PlanningNode {
 			return float.IsNaN(a) ? b : float.IsNaN(b) ? a : Mathf.Max(a, b);
 		}
 
+		/// <summary>
+		/// Old school style override of PatchedConics.CheckEncounter, set up in Start and reset at destroy.
+		/// We prevent any encounter with our starting body, and otherwise hand off to the default implementation.
+		/// </summary>
+		/// <param name="p">The patch currently being analyzed</param>
+		/// <param name="nextPatch">The next patch to be analyzed</param>
+		/// <param name="startEpoch">The time when the vessel reaches p</param>
+		/// <param name="sec">The driver of the orbit to check for an encounter; this is the only parameter that we actually use here rather than passing along to the default implementation</param>
+		/// <param name="targetBody">The user's currently selected target</param>
+		/// <param name="pars">Stuff that controls how the solver works</param>
+		/// <param name="logErrors">true to print things to the log, false otherwise</param>
+		/// <returns>
+		/// true if encounter found, false otherwise (or if one would have been found for our starting body)
+		/// </returns>
+		private bool MyCheckEncounter(
+			Orbit p, Orbit nextPatch, double startEpoch, OrbitDriver sec,
+			CelestialBody targetBody, PatchedConics.SolverParameters pars, bool logErrors = true)
+		{
+			// Suppress encounters with our starting body, because it makes the solver put NaN orbits in the flight plan
+			return sec?.celestialBody == editingNode?.origin
+				? false
+				: originalCheckEncounter(p, nextPatch, startEpoch, sec, targetBody, pars, logErrors);
+		}
+
 		private void Update()
 		{
 			if (node != null && solver != null && !solver.maneuverNodes.Contains(node)) {
@@ -294,6 +327,8 @@ namespace PlanningNode {
 				editingNode.deltaV   = dV;
 			}
 		}
+
+		private PatchedConics.CheckEncounterDelegate originalCheckEncounter;
 
 		private MapObject origCamTarget;
 		private float     origCamDist;

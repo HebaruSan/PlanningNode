@@ -64,7 +64,6 @@ Other notes:
 - You can click the text labels for a planning node to edit it.
 - You can use the "New" button in the dialog to create multiple nodes for the same vessel, and the `<` and `>` buttons next to the name field to switch to other nodes.
 - Editing in the tracking station would be desirable but is not possible because the stock maneuver editor crashes outside of the flight scene's map view.
-- Similarly, you may experience extreme log spam in some instances while editing nodes due to the stock maneuver editor being extremely sensitive about being used in unexpected ways (and the difficulty of figuring out what it takes to pacify it).
 - Blizzy's toolbar is not and will not be supported. 0.23.5 was a **long** time ago.
 
 ## How to donate

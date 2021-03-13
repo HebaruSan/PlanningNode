@@ -86,8 +86,8 @@ namespace PlanningNode {
 
 		private ManeuverNode OpenManeuver(Vessel v)
 		{
-			var nodes = v.patchedConicSolver.maneuverNodes;
-			for (int i = 0; i < nodes.Count; ++i) {
+			var nodes = v.patchedConicSolver?.maneuverNodes;
+			for (int i = 0; i < (nodes?.Count ?? 0); ++i) {
 				ManeuverNode nd = nodes[i];
 				if (nd.attachedGizmo != null) {
 					return nd;
@@ -107,7 +107,7 @@ namespace PlanningNode {
 					if (newTime.HasValue) {
 						nd.attachedGizmo.orbitsAdded += (int)Math.Round((newTime.Value - nd.UT) / renderer.vessel.orbit.period);
 						nd.UT = newTime.Value;
-						renderer.vessel.patchedConicSolver.UpdateFlightPlan();
+						renderer.vessel.patchedConicSolver?.UpdateFlightPlan();
 					}
 				}
 				nd.attachedGizmo?.SetMouseOverGizmo(true);

@@ -104,11 +104,18 @@ namespace PlanningNode {
 					launcher?.Disable(true);
 				}
 
+				string lockReason;
+				if (!unlocked(out lockReason)) {
+					launcher?.Disable(true);
+				}
+
 				launcher?.gameObject?.SetTooltip(
 					"PlanningNode_mainTitle",
 					launcher.IsEnabled 
 						? "PlanningNode_mainTooltip"
-						: "PlanningNode_viewOnlyTooltip"
+						: string.IsNullOrEmpty(lockReason)
+							? "PlanningNode_viewOnlyTooltip"
+							: lockReason
 				);
 			}
 		}
@@ -118,6 +125,40 @@ namespace PlanningNode {
 			if (launcher != null) {
 				ApplicationLauncher.Instance.RemoveModApplication(launcher);
 				launcher = null;
+			}
+		}
+
+		/// <summary>
+		/// Check whether the mod should be available for use in the current save.
+		/// We need patched conics and flight planning.
+		/// </summary>
+		/// <param name="reason">User friendly explanation of why we're not available</param>
+		/// <returns>
+		/// true if unlocked, false if locked
+		/// </returns>
+		private static bool unlocked(out string reason)
+		{
+			if (ScenarioUpgradeableFacilities.Instance == null) {
+				reason = "";
+				return true;
+			}
+			var gVars        = GameVariables.Instance;
+			var stationLevel = ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.TrackingStation);
+			var stationOK    = gVars.GetOrbitDisplayMode(stationLevel) == GameVariables.OrbitDisplayMode.PatchedConics;
+			var missionLevel = ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.MissionControl);
+			var missionOK    = gVars.UnlockedFlightPlanning(missionLevel);
+			if (!stationOK) {
+				reason = !missionOK ? "PlanningNode_unlockBothTooltip"
+				                    : "PlanningNode_unlockStationTooltip";
+				return false;
+			} else {
+				if (!missionOK) {
+					reason = "PlanningNode_unlockMisConTooltip";
+					return false;
+				} else {
+					reason = "";
+					return true;
+				}
 			}
 		}
 

@@ -70,7 +70,7 @@ Other notes:
 
 [![Donate][Donation image]][Donation link]
 
-[Donation link]: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=7H2LCH6SP7TTE&lc=US&item_name=HebaruSan_Mods&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted
+[Donation link]: https://paypal.me/HebaruSan
 
 [Donation image]: https://i.imgur.com/M9m07Qw.png
 
